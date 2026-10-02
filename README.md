@@ -3,7 +3,7 @@
 
 [![Python](https://img.shields.io/badge/Python-3.11%2B-blue?logo=python&logoColor=white)](https://www.python.org/)
 [![Pandas](https://img.shields.io/badge/Pandas-2.0%2B-150458?logo=pandas&logoColor=white)](https://pandas.pydata.org/)
-[![SQLite](https://img.shields.io/badge/SQLite-3.0%2B-003B57?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
+[![NumPy](https://img.shields.io/badge/NumPy-1.24%2B-013243?logo=numpy&logoColor=white)](https://numpy.org/)
 [![Jupyter](https://img.shields.io/badge/Jupyter-Notebook-F37626?logo=jupyter&logoColor=white)](https://jupyter.org/)
 [![Status](https://img.shields.io/badge/Status-Academic%20Research-success)](#marco-legal-y-descargo-de-responsabilidad)
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
@@ -20,7 +20,7 @@
 ## 1. Resumen Ejecutivo y Alcance del Proyecto
 Este repositorio alberga una investigación cuantitativa y un pipeline de ingeniería de datos demográficos aplicado al **Estado Lara, Venezuela**. El objetivo central es modelar la dinámica demográfica, estructura etaria, condiciones educativas (alfabetismo y nivel de instrucción), patrones de nupcialidad/estado conyugal e indicadores macroeconómicos de la fuerza de trabajo.
 
-El proyecto abarca desde la **ingeniería inversa y extracción automatizada de formatos legados (SYLK/REDATAM)** hasta la **reconciliación matemática de matrices multidimensionales (Ajuste Proporcional Iterativo / Algoritmo RAS)** y la persistencia estructurada en un esquema relacional OLAP local con **SQLite** y **Python (Pandas/NumPy)**.
+El proyecto abarca desde la **ingeniería inversa y extracción automatizada de formatos legados (SYLK/REDATAM)** hasta la **reconciliación matemática de matrices multidimensionales (Ajuste Proporcional Iterativo / Algoritmo RAS)** y el modelado y procesamiento estructurado de tabulados con **Python (Pandas/NumPy)**.
 
 ---
 
@@ -32,8 +32,8 @@ El proyecto abarca desde la **ingeniería inversa y extracción automatizada de 
   Ante la limitación del servidor censal que solo ofrecía tablas marginales bidimensionales ($2\text{D}$), se implementó el algoritmo de **Ajuste Proporcional Iterativo (Deming-Stephan)** para resolver el problema de optimización bajo información parcial:
   $$\min \sum_{i,j,k} N_{i,j,k} \ln\left(\frac{N_{i,j,k}}{N^0_{i,j,k}}\right)$$
   sujeto al cumplimiento simultáneo de las restricciones marginales oficiales por edad, sexo y condición educativa, garantizando exactitud matemática celda por celda sin alterar los agregados censales.
-* **Modelado Relacional y Arquitectura de Datos (SQL):**
-  Diseño e implementación de la base de datos relacional `demografia_lara.db` (>20 tablas normalizadas), permitiendo consultas estructuradas a nivel de entidad federal, municipio, parroquia y centro poblado mediante identificadores geoestadísticos normados (`Código UBIGEO`).
+* **Armonización y Modelado de Datos Geoestadísticos (Pandas):**
+  Construcción de estructuras matriciales e indexación jerárquica (`MultiIndex`) para articular datos a nivel de entidad federal, municipio y parroquia mediante identificadores geoestadísticos normados (`Código UBIGEO`), garantizando la integridad de agregaciones transversales entre censos, registros continuos y encuestas por muestreo.
 * **Rigor Metodológico Demográfico:**
   Segmentación analítica estricta según los universos censales de las variables:
   * *Población general:* Cohortes quinquenales desde $0$ a $4$ hasta $95$ y más años.
@@ -47,7 +47,6 @@ El proyecto abarca desde la **ingeniería inversa y extracción automatizada de 
 
 ```text
 ├── Análisis_Demográfico_del_Estado_Lara.ipynb   # Notebook principal de análisis y tabulaciones
-├── demografia_lara.db                           # Base de datos relacional normalizada (SQLite)
 ├── alfabetismo.xlsx                             # Dataset limpio de alfabetismo (Edad, Sexo y Cruce)
 ├── situacion_conyugal.xlsx                      # Dataset limpio de situación conyugal (Hombres, Mujeres, Total)
 ├── nivel_instruccion.xlsx                       # Dataset limpio de nivel educativo formal
@@ -98,7 +97,7 @@ Todos los datos utilizados en esta investigación provienen de fuentes oficiales
 ## 1. Executive Summary & Project Scope
 This repository houses an advanced quantitative study and demographic data engineering pipeline focused on **Lara State, Venezuela**. The primary objective is to analyze and model population dynamics, age-sex structures, educational metrics (literacy and formal schooling), nuptiality/marital patterns, and macroeconomic labor force indicators.
 
-The technical workflow spans **reverse-engineering and parsing legacy data formats (SYLK/REDATAM)**, **multidimensional matrix reconciliation via Iterative Proportional Fitting (IPF / RAS algorithm)**, and building a structured relational OLAP database using **SQLite** and **Python (Pandas/NumPy)**.
+The technical workflow spans **reverse-engineering and parsing legacy data formats (SYLK/REDATAM)**, **multidimensional matrix reconciliation via Iterative Proportional Fitting (IPF / RAS algorithm)**, and structured multidimensional data processing and modeling using **Python (Pandas/NumPy)**.
 
 ---
 
@@ -110,8 +109,8 @@ The technical workflow spans **reverse-engineering and parsing legacy data forma
   Overcame public census platform limitations (which only provided disjoint 2D marginal distributions) by implementing an **Iterative Proportional Fitting (Deming-Stephan algorithm)** pipeline under maximum entropy constraints:
   $$\min \sum_{i,j,k} N_{i,j,k} \ln\left(\frac{N_{i,j,k}}{N^0_{i,j,k}}\right)$$
   subject to exact preservation of known age, sex, and educational category marginals, ensuring cell-by-cell mathematical consistency without altering census totals.
-* **Relational Schema Design & Analytics (SQL):**
-  Engineered a normalized SQLite analytical database (`demografia_lara.db`) containing over 20 structured tables, enabling cross-sectional OLAP queries across federal, municipal, and parish levels indexed by standardized geo-statistical codes (`UBIGEO`).
+* **Geostatistical Data Harmonization & Tabular Modeling (Pandas):**
+  Engineered multi-level hierarchical indexing (`MultiIndex`) and standardized tabular structures across federal, municipal, and parish tiers using official geo-statistical codes (`UBIGEO`), ensuring seamless cross-sectional aggregations and mathematical consistency across censuses, civil registries, and household surveys.
 * **Demographic Methodological Rigor:**
   Enforced precise census universe boundaries:
   * *Total Population:* Standard 5-year cohorts from $0\text{--}4$ to $95+$.
@@ -125,7 +124,6 @@ The technical workflow spans **reverse-engineering and parsing legacy data forma
 
 ```text
 ├── Análisis_Demográfico_del_Estado_Lara.ipynb   # Main Jupyter notebook with analytical pipelines
-├── demografia_lara.db                           # Normalized relational SQLite database (>20 tables)
 ├── alfabetismo.xlsx                             # Reconciled literacy dataset (Age, Sex, Joint)
 ├── situacion_conyugal.xlsx                      # Standardized marital status dataset (Men, Women, Total)
 ├── nivel_instruccion.xlsx                       # Standardized educational attainment dataset
