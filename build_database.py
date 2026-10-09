@@ -10,6 +10,7 @@ DB_PATH = "demografia_lara.db"
 def clean_col(col_name: str) -> str:
     """Normaliza nombres de columna a snake_case ASCII limpio."""
     c = str(col_name).strip().lower()
+    c = c.replace("%", "pct_")
     c = unicodedata.normalize("NFKD", c).encode("ascii", "ignore").decode("ascii")
     c = re.sub(r"[^\w\s]", "", c)
     c = re.sub(r"\s+", "_", c)
@@ -427,6 +428,17 @@ def build_database():
     cols_serv = ["censo", "codigo_ubigeo", "entidad", "municipio", "parroquia", "total_hogares", "con_servicios", "con_deficit"]
     df_serv[cols_serv].to_sql("servicios_parroquia", conn, if_exists="replace", index=False)
 
+    # Migración interna inter-estadal 
+    df_mig_raw = pd.read_excel("Servicios-Censo_2011.xlsx", sheet_name="Sheet3", header=None)
+    df_mig = df_mig_raw.iloc[16:, 1:9].copy()
+    df_mig.columns = ["codigo_ubigeo", "entidad", "municipio", "parroquia", "en_la_entidad", "en_otra_entidad", "en_el_exterior", "total"]
+    df_mig = df_mig[df_mig["codigo_ubigeo"].astype(str).str.strip().str.match(r"^\d+$")].reset_index(drop=True)
+    df_mig["censo"] = 2011
+    df_mig["codigo_ubigeo"] = df_mig["codigo_ubigeo"].astype(str).str.zfill(6)
+    for c in ["en_la_entidad", "en_otra_entidad", "en_el_exterior", "total"]:
+        df_mig[c] = pd.to_numeric(df_mig[c], errors="coerce").fillna(0).astype(int)
+    df_mig[["censo", "codigo_ubigeo", "entidad", "municipio", "parroquia", "en_la_entidad", "en_otra_entidad", "en_el_exterior", "total"]].to_sql("migracion_interna_parroquia", conn, if_exists="replace", index=False)
+
     print("--- 11. Viviendas, Hogares y Personas (Censo 2011) ---")
     df_personas_p = pd.read_excel("VIVIENDAS-HOGARES-Y-PERSONAS-CENSO-2011.xlsx", sheet_name="PERSONAS PARROQUIA", header=1)
     df_personas_p = df_personas_p.dropna(subset=["UBIGEO", "PARROQUIA"]).reset_index(drop=True)
@@ -471,13 +483,41 @@ def build_database():
             df_viv_p[col] = pd.to_numeric(df_viv_p[col], errors="coerce").fillna(0).astype(int)
     df_viv_p[[c for c in v_cols if c in df_viv_p.columns]].to_sql("vivienda_parroquia", conn, if_exists="replace", index=False)
 
+    # Ingesta coNDAS-HOGARES-Y-PERSONAS-CENSO-2011
+    viviendas_extra_sheets = [
+        ("HOGARES PARROQUIA", "hogares_parroquia"),
+        ("HOGARES MUNICIPIO", "hogares_municipio"),
+        ("HOGARES ENTIDAD", "hogares_entidad"),
+        ("VIVIENDA MUNICIPIO", "vivienda_municipio"),
+        ("VIVIENDA ENTIDAD", "vivienda_entidad"),
+        ("PERSONAS MUNICIPIO", "personas_municipio"),
+        ("PERSONAS ENTIDAD", "personas_entidad"),
+    ]
+    f_viv = "VIVIENDAS-HOGARES-Y-PERSONAS-CENSO-2011.xlsx"
+    for s_name, tbl_name in viviendas_extra_sheets:
+        df_sheet = pd.read_excel(f_viv, sheet_name=s_name, header=1)
+        df_sheet = df_sheet.loc[:, ~df_sheet.columns.str.startswith("Unnamed")]
+        col_u = [c for c in df_sheet.columns if "UBIGEO" in str(c).upper()]
+        if col_u:
+            df_sheet = df_sheet.dropna(subset=[col_u[0]]).copy()
+            df_sheet = df_sheet[df_sheet[col_u[0]].astype(str).str.strip().str.match(r"^\d+$")].reset_index(drop=True)
+            pad_len = 6 if "PARROQUIA" in s_name else (4 if "MUNICIPIO" in s_name else 2)
+            df_sheet[col_u[0]] = df_sheet[col_u[0]].astype(str).str.zfill(pad_len)
+        df_sheet.columns = [clean_col(c) for c in df_sheet.columns]
+        df_sheet["censo"] = 2011
+        txt_cols = ["censo", "ubigeo", "parroquia", "entidad_federal", "entidad_y_municipio"]
+        for c in df_sheet.columns:
+            if c not in txt_cols and not isinstance(df_sheet[c], pd.DataFrame):
+                df_sheet[c] = pd.to_numeric(df_sheet[c], errors="coerce").fillna(0)
+        df_sheet.to_sql(tbl_name, conn, if_exists="replace", index=False)
+
     print("--- 12. Centros Poblados de Lara (Lara.xls) ---")
     df_lara_cp = pd.read_excel("Lara.xls")
     df_lara_cp.columns = [clean_col(c) for c in df_lara_cp.columns]
     df_lara_cp["censo"] = 2011
     df_lara_cp.to_sql("lara_centros_poblados", conn, if_exists="replace", index=False)
 
-    # Crear índices para alta velocidad de consulta y preparación para UNION con Censo 2001
+    # Índices para alta velocidad de consulta y preparación para UNION con Censo 2001
     print("--- Creando índices optimizados ---")
     indexes = [
         "CREATE INDEX IF NOT EXISTS idx_pob_sexo_ubigeo ON pob_sexo_parroquia (censo, codigo_ubigeo);",
