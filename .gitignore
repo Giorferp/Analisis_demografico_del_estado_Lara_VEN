@@ -1,0 +1,23 @@
+# Entornos virtuales y caches de Python
+.venv/
+venv/
+Demografia/
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Auxiliares de compilación LaTeX
+*.aux
+*.log
+*.out
+*.toc
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+
+# Sistema operativo
+.DS_Store
+Thumbs.db

@@ -1,167 +1,98 @@
-# Análisis Demográfico y Reconstrucción Cuantitativa de Datos Censales: Estado Lara, Venezuela
-## Demographic Analysis & Quantitative Census Data Reconstruction: Lara State, Venezuela
+# Análisis Demográfico y Reconstrucción Cuantitativa Censal: Estado Lara, Venezuela
 
 [![Python](https://img.shields.io/badge/Python-3.11%2B-blue?logo=python&logoColor=white)](https://www.python.org/)
-[![Pandas](https://img.shields.io/badge/Pandas-2.0%2B-150458?logo=pandas&logoColor=white)](https://pandas.pydata.org/)
-[![NumPy](https://img.shields.io/badge/NumPy-1.24%2B-013243?logo=numpy&logoColor=white)](https://numpy.org/)
-[![Jupyter](https://img.shields.io/badge/Jupyter-Notebook-F37626?logo=jupyter&logoColor=white)](https://jupyter.org/)
-[![Status](https://img.shields.io/badge/Status-Academic%20Research-success)](#marco-legal-y-descargo-de-responsabilidad)
+[![uv](https://img.shields.io/badge/uv-managed-6B5CE7)](https://docs.astral.sh/uv/)
+[![SQLite](https://img.shields.io/badge/SQLite-60%20Tablas-003B57?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
+[![XeLaTeX](https://img.shields.io/badge/XeLaTeX-APA%207-008080?logo=latex&logoColor=white)](https://www.tug.org/xetex/)
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 
----
-
-*Idiomas / Languages:* **[Español](#versión-en-español)** | **[English](#english-version)**
+Estudio demográfico integral y pipeline de ingeniería de datos aplicado al **Estado Lara (Venezuela)** sobre los microdatos y tabulados oficiales del **XIV Censo Nacional de Población y Vivienda 2011** (INE / REDATAM+SP), estadísticas vitales (MPPS) y series de la Encuesta de Hogares por Muestreo (EHM).
 
 ---
 
-<a name="versión-en-español"></a>
-# Versión en Español
+## 1. Entregables Principales para Presentación
 
-## 1. Resumen Ejecutivo y Alcance del Proyecto
-Este repositorio alberga una investigación cuantitativa y un pipeline de ingeniería de datos demográficos aplicado al **Estado Lara, Venezuela**. El objetivo central es modelar la dinámica demográfica, estructura etaria, condiciones educativas (alfabetismo y nivel de instrucción), patrones de nupcialidad/estado conyugal e indicadores macroeconómicos de la fuerza de trabajo.
-
-El proyecto abarca desde la **ingeniería inversa y extracción automatizada de formatos legados (SYLK/REDATAM)** hasta la **reconciliación matemática de matrices multidimensionales (Ajuste Proporcional Iterativo / Algoritmo RAS)** y el modelado y procesamiento estructurado de tabulados con **Python (Pandas/NumPy)**.
-
----
-
-## 2. Capacidades Técnicas y Aporte Cuantitativo (Highlights para Reclutadores)
-
-* **Pipelines de Extracción y Parsing ETL para Formatos Propietarios (SYLK):**
-  Desarrollo de parsers robustos desde cero en Python para procesar archivos de intercambio simbólico (`SYLK`) generados por el motor de microdatos *Redatam+SP* del INE/CEPAL, los cuales no son interpretables por librerías estándar como `openpyxl` o `xlrd`.
-* **Reconstrucción Multidimensional mediante Máxima Entropía (IPF / Algoritmo RAS):**
-  Ante la limitación del servidor censal que solo ofrecía tablas marginales bidimensionales ($2\text{D}$), se implementó el algoritmo de **Ajuste Proporcional Iterativo (Deming-Stephan)** para resolver el problema de optimización bajo información parcial:
-  $$\min \sum_{i,j,k} N_{i,j,k} \ln\left(\frac{N_{i,j,k}}{N^0_{i,j,k}}\right)$$
-  sujeto al cumplimiento simultáneo de las restricciones marginales oficiales por edad, sexo y condición educativa, garantizando exactitud matemática celda por celda sin alterar los agregados censales.
-* **Armonización y Modelado de Datos Geoestadísticos (Pandas):**
-  Construcción de estructuras matriciales e indexación jerárquica (`MultiIndex`) para articular datos a nivel de entidad federal, municipio y parroquia mediante identificadores geoestadísticos normados (`Código UBIGEO`), garantizando la integridad de agregaciones transversales entre censos, registros continuos y encuestas por muestreo.
-* **Rigor Metodológico Demográfico:**
-  Segmentación analítica estricta según los universos censales de las variables:
-  * *Población general:* Cohortes quinquenales desde $0$ a $4$ hasta $95$ y más años.
-  * *Alfabetismo y Nivel de Instrucción:* Población de $10$ años y más ($\ge 10$).
-  * *Situación Conyugal:* Población de $12$ años y más ($\ge 12$).
-  * *Fuerza de Trabajo:* Población en Edad de Trabajar según estándares internacionales OIT/INE ($\ge 15$ años).
+| Entregable | Ruta | Descripción |
+| :--- | :--- | :--- |
+| **Informe Técnico Compilado (PDF)** | [`report/Análisis_Demográfico_del_Estado_Lara.pdf`](report/Análisis_Demográfico_del_Estado_Lara.pdf) | Memoria analítica de 23 páginas en formato APA 7 (XeLaTeX + Times New Roman), con 16 cuadros y 4 figuras vectoriales. |
+| **Manuscrito Fuente (LaTeX)** | [`report/Análisis_Demográfico_del_Estado_Lara.tex`](report/Análisis_Demográfico_del_Estado_Lara.tex) | Fuente tipográfica reproducible del informe y sus 16 cuadros canónicos. |
+| **Cuaderno Interactivo (Jupyter)** | [`notebooks/Análisis_Demográfico_del_Estado_Lara.ipynb`](notebooks/Análisis_Demográfico_del_Estado_Lara.ipynb) | Notebook ejecutado conectado a SQLite con consultas SQL, tablas formateadas y gráficos. |
+| **Base Relacional Canónica** | [`data/processed/demografia_lara.db`](data/processed/demografia_lara.db) | Base SQLite auditada con 60 tablas (microdatos volcados, cruces IPF y tablas de vida). |
+| **Figuras Vectoriales** | [`report/figures/`](report/figures/) | Cuatro gráficos vectoriales PDF nativos (`fig_lara_1.pdf` a `fig_lara_4.pdf`). |
 
 ---
 
-## 3. Estructura del Repositorio
+## 2. Arquitectura del Proyecto
 
 ```text
-├── Análisis_Demográfico_del_Estado_Lara.ipynb   # Notebook principal de análisis y tabulaciones
-├── alfabetismo.xlsx                             # Dataset limpio de alfabetismo (Edad, Sexo y Cruce)
-├── situacion_conyugal.xlsx                      # Dataset limpio de situación conyugal (Hombres, Mujeres, Total)
-├── nivel_instruccion.xlsx                       # Dataset limpio de nivel educativo formal
-├── TRABAJO.xlsx                                 # Series históricas oficiales de la EHM (1999-2025)
-├── Lara.xls                                     # Microdatos censales de centros poblados e infraestructura
-├── Poblacion-*.xlsx                             # Tabulados base de población por sexo, edad y origen
-├── Servicios-Censo_2011.xlsx                    # Cobertura de servicios básicos por parroquia
-├── VIVIENDAS-HOGARES-Y-PERSONAS-CENSO-2011.xlsx # Agregados de vivienda, hogar y personas por UBIGEO
-└── README.md                                    # Documentación técnica, metodológica y legal
+.
+├── README.md                                       # Documentación principal y guía de reproducibilidad
+├── pyproject.toml                                  # Dependencias Python gestionadas con uv
+├── .gitignore                                      # Exclusión de entornos, caches y auxiliares LaTeX
+├── data/
+│   ├── raw/                                        # 62 tabulados originales INE / REDATAM (.xls, .xlsx)
+│   └── processed/
+│       └── demografia_lara.db                      # Base SQLite canónica y auditada (60 tablas)
+├── src/
+│   ├── build_database.py                           # Parsers puros Python (SYLK/BIFF8/XLSX) + cruces ETL
+│   ├── build_notebook.py                           # Generador programático del cuaderno Jupyter
+│   ├── generate_figures.py                         # Generación de figuras vectoriales desde SQLite
+│   └── build_report.py                             # Compilación reproducible a PDF vía XeLaTeX
+├── notebooks/
+│   └── Análisis_Demográfico_del_Estado_Lara.ipynb  # Cuaderno interactivo ejecutado (43 celdas)
+├── report/
+│   ├── Análisis_Demográfico_del_Estado_Lara.pdf    # Informe final compilado (23 páginas)
+│   ├── Análisis_Demográfico_del_Estado_Lara.tex    # Código fuente LaTeX
+│   └── figures/
+│       ├── fig_lara_1.pdf                          # Pirámide quinquenal Lara vs. Venezuela
+│       ├── fig_lara_2.pdf                          # Analfabetismo por cohortes y disparidad municipal
+│       ├── fig_lara_3.pdf                          # Estructura conyugal y trayectoria etaria (≥ 15 años)
+│       └── fig_lara_4.pdf                          # Fuerza de trabajo, formalidad y ramas de actividad
+└── docs/
+    ├── NOMENCLATURA_OFICIAL.md                     # Estándar terminológico, notación matemática y estilo
+    └── audit/                                      # Dictámenes de auditoría numérica, tabular y estilo
+        ├── AUDITORIA_TABLAS_LARA.md
+        ├── AUDITORIA_NUMERICA_LARA.md
+        ├── CERTIFICACION_FINAL_LARA.md
+        └── DICTAMEN_AUDITORIA_CUANTITATIVA_FINAL_LARA.md
 ```
 
 ---
 
-## 4. Fuentes de Datos y Procedencia
-Todos los datos utilizados en esta investigación provienen de fuentes oficiales del Estado venezolano y organismos internacionales de estadística:
+## 3. Síntesis Cuantitativa (Censo 2011 y Proyección 2016)
 
-1. **Instituto Nacional de Estadística (INE), República Bolivariana de Venezuela:**
-   * **XIV Censo Nacional de Población y Vivienda (2011):** Microdatos agregados procesados a través del servidor en línea *Redatam+SP* (CEPAL/CELADE) y publicaciones oficiales del empadronamiento de viviendas, hogares y personas.
-   * **Encuesta de Hogares por Muestreo (EHM):** Indicadores Globales de la Fuerza de Trabajo, 1eros Semestres 1999–2025 (Cuadros de ocupación, sector formal/informal, ramas CIIU y nivel educativo).
-   * **Estadísticas Vitales y Demográficas:** Registros continuos de nacimientos y matrimonios por entidad y municipio.
-2. **CELADE - División de Población de la CEPAL (Comisión Económica para América Latina y el Caribe):**
-   * Metodologías y estándares del software *Redatam+SP* (*Retrieval of Data for Small Areas by Microcomputer*).
+- **Volumen y Distribución Territorial:** $1.774.867$ habitantes ($883.775$ hombres; $891.092$ mujeres; $\text{IM} = 99{,}18$) sobre $19.800\text{ km}^2$ ($89{,}64\text{ hab./km}^2$). La conurbación Iribarren–Palavecino concentra el $65{,}94\%$ de la población en el $16{,}16\%$ del territorio.
+- **Estructura Etaria y Bono Demográfico:** $26{,}94\%$ menores de 15 años ($478.217$), $66{,}90\%$ entre 15 y 64 años ($1.187.304$) y $6{,}16\%$ adultos mayores de 65 años y más ($109.346$); Edad Mediana $Me = 27{,}54$ años y Razón de Dependencia Total $\text{RDD} = 49{,}49$.
+- **Capital Humano y Situación Conyugal:** Tasa de analfabetismo de $5{,}56\%$ en población $\ge 10$ años ($81.340$ de $1.463.542$ residentes). En población declarante $\ge 15$ años ($1.289.325$), el $50{,}53\%$ está casado o unido, $40{,}72\%$ soltero y $8{,}75\%$ disuelto (razón $1{,}13$ uniones consensuales por matrimonio civil).
+- **Mercado Laboral ($\ge 15$ años):** En Censo 2011, $\text{PET} = 1.296.650$, $\text{PEA} = 794.846$ ($\text{TAE} = 61{,}30\%$), $\text{PO} = 731.258$ ($\text{TO} = 92{,}00\%$) y $\text{PD} = 63.588$ ($\text{TD} = 8{,}00\%$). La EHM calibra una ocupación de $701.209$ puestos ($58{,}00\%$ formal y $42{,}00\%$ informal; $66{,}00\%$ en el sector terciario).
+- **Mortalidad y Proyección 2011–2016:** Tasa Bruta de Mortalidad observada de $5{,}14\text{‰}$ que desciende a $4{,}96\text{‰}$ al tipificar directamente contra Venezuela ($5{,}02\text{‰}$); esperanza de vida al nacer $e_0^0 = 74{,}42$ años ($77{,}56$ mujeres; $71{,}48$ hombres). La proyección por componentes sitúa la población en $1.874.973$ habitantes para 2016.
 
 ---
 
-## 5. Marco Legal, Naturaleza Académica y Exención de Responsabilidad
+## 4. Flujo de Trabajo y Reproducibilidad
 
-> [!IMPORTANT]
-> ### Declaración de Naturaleza Estrictamente Académica
-> El presente proyecto constituye un trabajo de investigación científica, cuantitativa y pedagógica desarrollado en el marco de estudios demográficos de pregrado en la **Universidad Central de Venezuela (UCV)**. Su único propósito es la formación profesional, el modelado estadístico y la divulgación de habilidades analíticas en ciencia de datos.
+El proyecto utiliza **`uv`** para la gestión reproducible de dependencias Python y **XeLaTeX** para la compilación tipográfica del informe.
 
-### Cumplimiento de la Legislación Venezolana e Internacional
+```bash
+# 1. Regenerar las 4 figuras vectoriales (report/figures/fig_lara_1..4.pdf) desde SQLite
+uv run python src/generate_figures.py
 
-1. **Principio de Secreto y Reserva Estadística:**
-   En estricto cumplimiento del **Artículo 22 y concordantes de la Ley de la Función Pública de Estadística** de la República Bolivariana de Venezuela, este repositorio **NO contiene, manipula ni expone datos nominativos individuales, privados ni confidenciales**. Toda la información procesada corresponde a agregados macroestadísticos y tabulados censales de dominio público anonimizados por el INE.
-2. **Uso Legítimo con Fines Académicos y de Investigación (Fair Use):**
-   De conformidad con el **Artículo 44 (numerales 1 y 2) de la Ley sobre el Derecho de Autor de Venezuela** y los tratados internacionales de propiedad intelectual (Convenio de Berna), es lícita la utilización, reproducción y análisis de datos e informes oficiales de acceso público con fines estrictamente didácticos, de investigación científica y sin fines de lucro comercial.
-3. **Exención de Responsabilidad Oficial (Disclaimer):**
-   Este proyecto es un análisis independiente realizado por estudiantes/investigadores y **no representa una posición oficial, dictamen institucional o certificación legal** del Instituto Nacional de Estadística (INE), del Gobierno de Venezuela, ni de la CEPAL. Ni el autor ni las instituciones académicas vinculadas asumen responsabilidad por el uso o interpretación secundaria que terceros hagan de estos modelos.
-4. **Licenciamiento de Código:**
-   El código fuente de extracción, pipelines ETL y modelado cuantitativo está disponible bajo los términos de la licencia **Creative Commons Reconocimiento-NoComercial-CompartirIgual 4.0 Internacional (CC BY-NC-SA 4.0)**.
+# 2. Compilar el informe final en PDF (report/Análisis_Demográfico_del_Estado_Lara.pdf)
+uv run python src/build_report.py
 
----
+# 3. Regenerar la estructura del cuaderno Jupyter (opcional)
+uv run python src/build_notebook.py
 
-<a name="english-version"></a>
-# English Version
-
-## 1. Executive Summary & Project Scope
-This repository houses an advanced quantitative study and demographic data engineering pipeline focused on **Lara State, Venezuela**. The primary objective is to analyze and model population dynamics, age-sex structures, educational metrics (literacy and formal schooling), nuptiality/marital patterns, and macroeconomic labor force indicators.
-
-The technical workflow spans **reverse-engineering and parsing legacy data formats (SYLK/REDATAM)**, **multidimensional matrix reconciliation via Iterative Proportional Fitting (IPF / RAS algorithm)**, and structured multidimensional data processing and modeling using **Python (Pandas/NumPy)**.
-
----
-
-## 2. Technical Capabilities & Quantitative Highlights (For Recruiters)
-
-* **Legacy Data Parsing & Custom ETL Pipelines (SYLK):**
-  Engineered custom text-stream parsers in pure Python to process symbolic link (`SYLK`) spreadsheets generated by the UN-ECLAC/INE *Redatam+SP* census engine, bypassing failures in standard libraries (`openpyxl`, `xlrd`).
-* **Multidimensional Contingency Table Reconciliation (IPF / RAS Algorithm):**
-  Overcame public census platform limitations (which only provided disjoint 2D marginal distributions) by implementing an **Iterative Proportional Fitting (Deming-Stephan algorithm)** pipeline under maximum entropy constraints:
-  $$\min \sum_{i,j,k} N_{i,j,k} \ln\left(\frac{N_{i,j,k}}{N^0_{i,j,k}}\right)$$
-  subject to exact preservation of known age, sex, and educational category marginals, ensuring cell-by-cell mathematical consistency without altering census totals.
-* **Geostatistical Data Harmonization & Tabular Modeling (Pandas):**
-  Engineered multi-level hierarchical indexing (`MultiIndex`) and standardized tabular structures across federal, municipal, and parish tiers using official geo-statistical codes (`UBIGEO`), ensuring seamless cross-sectional aggregations and mathematical consistency across censuses, civil registries, and household surveys.
-* **Demographic Methodological Rigor:**
-  Enforced precise census universe boundaries:
-  * *Total Population:* Standard 5-year cohorts from $0\text{--}4$ to $95+$.
-  * *Literacy & Formal Education:* Population aged 10 and older ($\ge 10$).
-  * *Marital Status:* Population aged 12 and older ($\ge 12$), reflecting legal/census eligibility.
-  * *Labor Force & Economic Activity:* Working Age Population ($\ge 15$), strictly adhering to ILO/INE standards.
-
----
-
-## 3. Repository Architecture
-
-```text
-├── Análisis_Demográfico_del_Estado_Lara.ipynb   # Main Jupyter notebook with analytical pipelines
-├── alfabetismo.xlsx                             # Reconciled literacy dataset (Age, Sex, Joint)
-├── situacion_conyugal.xlsx                      # Standardized marital status dataset (Men, Women, Total)
-├── nivel_instruccion.xlsx                       # Standardized educational attainment dataset
-├── TRABAJO.xlsx                                 # Official historical labor survey time series (1999-2025)
-├── Lara.xls                                     # Locality-level infrastructure and census microdata
-├── Poblacion-*.xlsx                             # Baseline demographic data by age, sex, and birthplace
-├── Servicios-Censo_2011.xlsx                    # Basic utility infrastructure coverage by parish
-├── VIVIENDAS-HOGARES-Y-PERSONAS-CENSO-2011.xlsx # Housing, household, and individual census aggregates
-└── README.md                                    # Technical, methodological, and legal documentation
+# 4. Ejecutar el cuaderno interactivo desde la raíz o desde notebooks/
+uv run --with jupyterlab jupyter lab notebooks/Análisis_Demográfico_del_Estado_Lara.ipynb
 ```
 
----
-
-## 4. Data Provenance & Citations
-All datasets used in this research originate from official Venezuelan governmental statistics and international statistical bodies:
-
-1. **National Institute of Statistics (INE - Instituto Nacional de Estadística), Bolivarian Republic of Venezuela:**
-   * **XIV National Population and Housing Census (2011):** Aggregated census microdata processed via the *Redatam+SP* web server (UN-ECLAC/CELADE) and official published summary bulletins.
-   * **Household Sample Survey (EHM - Encuesta de Hogares por Muestreo):** Global Labor Force Indicators, 1st Semesters 1999–2025 (employment status, formal/informal sectors, ISIC economic branches, and schooling).
-   * **Vital Statistics:** Continuous civil registry series for births and marriages across states and municipalities.
-2. **CELADE - Population Division of ECLAC (United Nations Economic Commission for Latin America and the Caribbean):**
-   * Standards and computational methodologies of the *Redatam+SP* system (*Retrieval of Data for Small Areas by Microcomputer*).
+> **Nota sobre la base de datos (`data/processed/demografia_lara.db`):** La base SQLite incluida constituye el artefacto relacional auditado con 60 tablas (incluyendo las tablas base del Censo 2011, los cruces IPF, las tablas de vida Reed-Merrell y las conciliaciones descritas en `docs/audit/`). El script [`src/build_database.py`](src/build_database.py) implementa los parsers en librería estándar pura (`SYLK`, `BIFF8`, `XLSX`) y protege el archivo auditado exigiendo el argumento explícito `--rebuild` para evitar sobrescrituras accidentales.
 
 ---
 
-## 5. Legal Framework, Academic Fair Use & Compliance
+## 5. Fuentes y Marco Legal
 
-> [!IMPORTANT]
-> ### Academic Research Statement
-> This repository represents an independent academic, educational, and quantitative research study conducted as part of undergraduate demographic training at the **Universidad Central de Venezuela (UCV)**. It is created solely for educational purposes, quantitative modeling demonstration, and non-commercial analytical skill portfolio showcase.
-
-### Compliance & Legal Disclaimers
-
-1. **Statistical Secrecy & Privacy Protection:**
-   In compliance with **Article 22 of the Venezuelan Public Statistical Function Act (Ley de la Función Pública de Estadística)**, this repository **DOES NOT contain, process, or expose any personal, nominative, or individually identifiable microdata**. All data points are anonymized macro-level statistical aggregations released to the public domain by the official statistical bureau.
-2. **Fair Use & Copyright Exemption:**
-   In accordance with **Article 44 of the Venezuelan Copyright Law (Ley sobre el Derecho de Autor)** and international intellectual property conventions (Berne Convention), the use, transformation, and pedagogical analysis of public government statistics for strictly scientific, academic, and non-commercial research is fully lawful and protected.
-3. **Non-Affiliation & Disclaimer of Official Endorsement:**
-   This project is an independent computational analysis by academic researchers and **does not constitute an official report, endorsement, or certified statement** from the National Institute of Statistics (INE), the Government of Venezuela, or UN-ECLAC. Neither the author nor associated academic entities assume liability for secondary interpretations or derivative usage by third parties.
-4. **Code License:**
-   The parsing code, ETL pipelines, and quantitative algorithms are distributed under the **Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License (CC BY-NC-SA 4.0)**.
+- **Fuentes Oficiales:** Instituto Nacional de Estadística (INE — XIV Censo Nacional de Población y Vivienda 2011, REDATAM+SP, Encuesta de Hogares por Muestreo) y Ministerio del Poder Popular para la Salud (MPPS — Anuario de Mortalidad 2011).
+- **Naturaleza Académica:** Investigación desarrollada en la Cátedra de Demografía, Escuela de Estadística y Ciencias Actuariales (EECA), Facultad de Ciencias Económicas y Sociales (FACES), **Universidad Central de Venezuela (UCV)**.
+- **Licencia y Reserva Estadística:** Todos los insumos corresponden a agregados macroestadísticos públicos y anónimos (Art. 22 de la Ley de la Función Pública de Estadística; Art. 44 de la Ley sobre el Derecho de Autor). Código bajo licencia **CC BY-NC-SA 4.0**.
